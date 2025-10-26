@@ -1,6 +1,7 @@
 import readline from 'node:readline';
 import os from 'node:os';
 import { up, cd, ls } from './navigate.js';
+import { cat, add, mkdir, rn, cp, mv, rm } from './files.js';
 
 export async function startCli(username) {
     const rl = readline.createInterface({
@@ -32,6 +33,27 @@ export async function startCli(username) {
 
         try {
             switch (command) {
+                case 'cat':
+                    await cat(args[0]);
+                    break;
+                case 'add':
+                    await add(args[0]);
+                    break;
+                case 'mkdir':
+                    await mkdir(args[0]);
+                    break;
+                case 'rn':
+                    await rn(args[0], args[1]);
+                    break;
+                case 'cp':
+                    await cp(args[0], args[1]);
+                    break;
+                case 'mv':
+                    await mv(args[0], args[1]);
+                    break;
+                case 'rm':
+                    await rm(args[0]);
+                    break;
                 case 'up':
                     await up();
                     break;

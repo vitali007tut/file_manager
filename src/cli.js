@@ -1,6 +1,6 @@
 import readline from 'node:readline';
 import os from 'node:os';
-import path from 'node:path';
+import { up, cd, ls } from './navigate.js';
 
 export async function startCli(username) {
     const rl = readline.createInterface({
@@ -10,19 +10,17 @@ export async function startCli(username) {
     });
 
     function printCwd() {
-        const cwd = process.cwd();
-        console.log(`You are currently in ${cwd}`);
+        console.log(`You are currently in ${process.cwd()}`);
     }
 
     try {
         process.chdir(os.homedir());
-    } catch (err) {
-    }
+    } catch {}
 
     printCwd();
     rl.prompt();
 
-    rl.on('line', (line) => {
+    rl.on('line', async (line) => {
         const input = line.trim();
 
         if (input === '.exit') {
@@ -30,13 +28,29 @@ export async function startCli(username) {
             return;
         }
 
-        if (!input) {
-            printCwd();
-            rl.prompt();
-            return;
+        const [command, ...args] = input.split(' ');
+
+        try {
+            switch (command) {
+                case 'up':
+                    await up();
+                    break;
+                case 'cd':
+                    if (!args[0]) throw new Error('Invalid input');
+                    await cd(args.join(' '));
+                    break;
+                case 'ls':
+                    await ls();
+                    break;
+                case '':
+                    break;
+                default:
+                    console.log('Invalid input');
+            }
+        } catch {
+            console.error('Operation failed');
         }
 
-        console.log('Invalid input');
         printCwd();
         rl.prompt();
     });
@@ -46,7 +60,5 @@ export async function startCli(username) {
         process.exit(0);
     });
 
-    process.on('SIGINT', () => {
-        rl.close();
-    });
+    process.on('SIGINT', () => rl.close());
 }
